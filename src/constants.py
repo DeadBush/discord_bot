@@ -5,7 +5,8 @@ PERSONAL_INFO = {
     "gender": "Nam",
     "university": "Đại Học Khoa Học Tự Nhiên - ĐHQG Hà Nội",
     "middle_school": "THCS Nguyễn Văn Trỗi",
-    "high_school": "Trường THPT Phú Nhuận"
+    "high_school": "Trường THPT Phú Nhuận",
+    "birthday": "27/10/2003"
 }
 
 # Funny responses for random selection
