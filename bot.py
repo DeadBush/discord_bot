@@ -45,11 +45,11 @@ def process_message(message):
     lower_message = message.lower()
     
     # Kiểm tra nếu có người giả mạo
-    if "@yomsi." in message:
+    if "Kaisen#exson" in message:
         return "Thằng này giả mạo tôi!"
     
     # Kiểm tra nếu là bạn thân
-    if "@minhden." in message:
+    if "Skye._" in message:
         return "Đây là bạn thân của tôi!"
     
     # Kiểm tra nếu tin nhắn không phải tiếng Việt
