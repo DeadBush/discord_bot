@@ -1,12 +1,21 @@
+import logging
 from src.config import get_bot_config, TOKEN
 from src.message_handler import process_message
+import discord
 
-# Initialize bot
+# Set up logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+# Initialize bot with reconnect enabled
 bot = get_bot_config()
 
 @bot.event
 async def on_ready():
-    print(f'{bot.user} đã sẵn sàng!')
+    logger.info(f'{bot.user} đã sẵn sàng phục vụ!')
 
 @bot.event
 async def on_message(message):
@@ -14,12 +23,29 @@ async def on_message(message):
     if message.author == bot.user:
         return
 
-    # Process message and send response
-    response = process_message(message.content, message.author)
-    await message.channel.send(response)
+    try:
+        # Process message and send response
+        response = process_message(message.content, message.author)
+        await message.channel.send(response)
+    except Exception as e:
+        logger.error(f"Lỗi khi xử lý tin nhắn: {str(e)}")
 
-# Run the bot
-try:
-    bot.run(TOKEN)
-except Exception as e:
-    print(f"Lỗi khi khởi động bot: {str(e)}")
+@bot.event
+async def on_error(event, *args, **kwargs):
+    logger.error(f"Lỗi trong event {event}: {str(args)} - {str(kwargs)}")
+
+@bot.event
+async def on_disconnect():
+    logger.warning("Bot đã mất kết nối từ Discord")
+
+# Run the bot with auto-reconnect
+while True:
+    try:
+        logger.info("Đang kết nối tới Discord...")
+        bot.run(TOKEN)
+    except discord.errors.ConnectionClosed:
+        logger.warning("Mất kết nối. Đang thử kết nối lại...")
+        continue
+    except Exception as e:
+        logger.error(f"Lỗi không mong đợi: {str(e)}")
+        break

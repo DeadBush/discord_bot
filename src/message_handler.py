@@ -1,6 +1,6 @@
 import random
-from .constants import PERSONAL_INFO, FUNNY_RESPONSES, SPECIAL_USERS
-from .utils import is_vietnamese
+from src.constants import PERSONAL_INFO, FUNNY_RESPONSES, SPECIAL_USERS
+from src.utils import is_vietnamese
 
 def process_message(message, author):
     """Process incoming messages and return appropriate response."""
@@ -14,7 +14,12 @@ def process_message(message, author):
     # Check for special users
     author_str = str(author)
     if author_str in SPECIAL_USERS:
-        return SPECIAL_USERS[author_str] + process_personal_info(lower_message)
+        # Process personal info first
+        personal_response = process_personal_info(lower_message)
+        if personal_response:
+            return SPECIAL_USERS[author_str] + personal_response
+        # If no personal info response, return random or default
+        return SPECIAL_USERS[author_str] + (random.choice(FUNNY_RESPONSES) if random.random() > 0.5 else "Tôi bị ngu")
         
     # Process personal information questions
     response = process_personal_info(lower_message)
