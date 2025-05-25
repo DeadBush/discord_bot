@@ -22,13 +22,16 @@ async def on_message(message):
     # Ignore messages from the bot itself
     if message.author == bot.user:
         return
-
-    try:
-        # Process message and send response
-        response = process_message(message.content, message.author)
-        await message.channel.send(response)
-    except Exception as e:
-        logger.error(f"Lỗi khi xử lý tin nhắn: {str(e)}")
+    # Chỉ phản hồi khi tin nhắn bắt đầu bằng '!thong'
+    if message.content.startswith('!thong'):
+        # Lấy nội dung sau '!thong'
+        prompt = message.content[len('!thong'):].strip()
+        try:
+            # Process message and send response
+            response = process_message(prompt, message.author.id)
+            await message.channel.send(response)
+        except Exception as e:
+            logger.error(f"Lỗi khi xử lý tin nhắn: {str(e)}")
 
 @bot.event
 async def on_error(event, *args, **kwargs):

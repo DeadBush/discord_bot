@@ -45,6 +45,6 @@ def process_personal_info(message):
         return f"Tớ là cựu học sinh {PERSONAL_INFO['high_school']} nè 🏫"
     elif 'trường' in message:
         return f"Tớ tự hào khi là sinh viên {PERSONAL_INFO['university']} !!"
-    elif 'ngày sinh' in message:
+    elif 'ngày sinh' in message or 'sinh nhật' in message or 'sinh ngày' in message:
         return f"Tớ sinh ngày {PERSONAL_INFO['birthday']} nè! 🎂"
     return None 
