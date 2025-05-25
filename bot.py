@@ -44,6 +44,14 @@ def process_message(message):
     # Chuyển message về chữ thường để dễ xử lý
     lower_message = message.lower()
     
+    # Kiểm tra nếu có người giả mạo
+    if "@yomsi." in message:
+        return "Thằng này giả mạo tôi!"
+    
+    # Kiểm tra nếu là bạn thân
+    if "@minhden." in message:
+        return "Đây là bạn thân của tôi!"
+    
     # Kiểm tra nếu tin nhắn không phải tiếng Việt
     if not is_vietnamese(message):
         return "Tôi bị ngu"
