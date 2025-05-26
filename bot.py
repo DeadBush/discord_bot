@@ -26,9 +26,11 @@ async def on_message(message):
     if message.content.startswith('!thong'):
         # Lấy nội dung sau '!thong'
         prompt = message.content[len('!thong'):].strip()
+        user_name = message.author.display_name
         try:
             # Process message and send response
-            response = process_message(prompt, message.author.id)
+            print(f"Processing message from {user_name}: {prompt}")
+            response = process_message(prompt, user_name)
             await message.channel.send(response)
         except Exception as e:
             logger.error(f"Lỗi khi xử lý tin nhắn: {str(e)}")

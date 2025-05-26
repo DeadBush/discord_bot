@@ -9,5 +9,5 @@ TOKEN = os.getenv("DISCORD_TOKEN")
 # Bot configuration
 def get_bot_config():
     intents = discord.Intents.default()
-    intents.message_content = True
+    intents.message_content = True  
     return discord.Client(intents=intents) 
