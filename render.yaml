@@ -10,4 +10,5 @@ services:
     scaling:
       minInstances: 1
       maxInstances: 1
-    plan: free 
+    plan: free
+    port: 8080
