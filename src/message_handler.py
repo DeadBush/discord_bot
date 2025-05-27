@@ -1,6 +1,6 @@
 import random
 from src.constants import PERSONAL_INFO, FUNNY_RESPONSES, SPECIAL_RESPONSES, SPECIAL_USERS
-from src.utils import is_user_DeadBush, is_user_ToMan, is_vietnamese, is_user_Skye, is_user_Kaisen
+from src.utils import is_user_DeadBush, is_user_ToMan, is_user_Skye, is_user_Kaisen
 
 def process_message(message, user_name):
     """Process incoming messages and return appropriate response."""
@@ -92,7 +92,7 @@ def process_message(message, user_name):
 
 
     # Process personal information questions
-    response = process_personal_info(lower_message)
+    response = process_personal_info(lower_message) or process_special_responses(lower_message)
     if response:
         return response
         
