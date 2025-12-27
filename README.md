@@ -5,6 +5,7 @@ Bot Discord cá nhân của Thống với phong cách trò chuyện trẻ trung,
 ## Tính năng
 
 - **AI-Powered Responses**: Sử dụng AI model (Groq/Hugging Face) để trả lời thông minh
+- **Valorant Match Tracking**: Theo dõi và thông báo khi người chơi bắt đầu trận đấu Valorant
 - Trả lời các câu hỏi về thông tin cá nhân dựa trên `prompts.txt`
 - Chỉ giao tiếp bằng tiếng Việt
 - Phong cách trò chuyện vui vẻ, trẻ trung, châm biếm
@@ -31,12 +32,20 @@ pip install -r requirements.txt
 DISCORD_TOKEN=your_discord_bot_token_here
 GROQ_API_KEY=your_groq_api_key_here
 HUGGINGFACE_API_KEY=your_huggingface_api_key_here  # Tùy chọn, chỉ cần nếu muốn dùng Hugging Face
+RIOT_API_KEY=your_riot_api_key_here  # Bắt buộc cho tính năng theo dõi Valorant
+RIOT_REGION=ap  # Khu vực: ap (Asia Pacific), na, eu, kr, etc.
 ```
 
-4. Lấy Groq API key (miễn phí):
-   - Đăng ký tại [Groq Console](https://console.groq.com/)
-   - Tạo API key mới
-   - Copy và thêm vào file `.env`
+4. Lấy API keys:
+   - **Groq API key** (miễn phí):
+     - Đăng ký tại [Groq Console](https://console.groq.com/)
+     - Tạo API key mới
+     - Copy và thêm vào file `.env`
+   - **Riot Games API key** (miễn phí, bắt buộc cho Valorant tracking):
+     - Đăng ký tại [Riot Developer Portal](https://developer.riotgames.com/)
+     - Tạo API key mới
+     - **Lưu ý**: API key có giới hạn rate limit (100 requests mỗi 2 phút cho development key)
+     - Copy và thêm vào file `.env`
 
 5. Chạy bot:
 ```bash
@@ -55,6 +64,63 @@ python bot.py
    - Tự động tùy chỉnh phong cách dựa trên nội dung trong `prompts.txt`
 
 **Lưu ý:** Bot sẽ phản hồi mọi tin nhắn (trừ tin nhắn từ chính bot). Đảm bảo bot chỉ có quyền truy cập vào các kênh bạn muốn bot hoạt động.
+
+## Tính năng theo dõi Valorant
+
+Bot có thể tự động theo dõi và thông báo khi người chơi bắt đầu/kết thúc trận đấu Valorant, kèm theo thống kê chi tiết và nhận xét AI bằng tiếng Việt.
+
+### Cách sử dụng:
+
+1. **Liên kết tài khoản Discord với Riot (Khuyến nghị - Tự động theo dõi):**
+   ```
+   !link riot <TênRiot> <TagRiot>
+   ```
+   Ví dụ: `!link riot PlayerName 1234`
+   
+   Sau khi liên kết, bot sẽ **tự động** theo dõi khi bạn bắt đầu chơi Valorant (qua Discord presence).
+
+2. **Thêm người chơi vào danh sách theo dõi (Thủ công):**
+   ```
+   !track valorant <TênRiot> <TagRiot>
+   ```
+   Ví dụ: `!track valorant PlayerName 1234`
+
+3. **Xóa người chơi khỏi danh sách theo dõi:**
+   ```
+   !untrack valorant
+   ```
+
+4. **Đặt kênh thông báo** (cần quyền Administrator):
+   ```
+   !set valorant channel
+   ```
+   Lệnh này sẽ đặt kênh hiện tại làm kênh nhận thông báo khi có trận đấu mới.
+
+5. **Xem danh sách người chơi được theo dõi:**
+   ```
+   !list tracked
+   ```
+
+### Tính năng tự động:
+
+- **Tự động phát hiện khi bắt đầu chơi**: Khi bạn liên kết tài khoản và bắt đầu chơi Valorant, bot sẽ tự động theo dõi bạn
+- **Thông báo khi bắt đầu trận đấu**: Bot sẽ thông báo khi bạn vào trận đấu
+- **Thống kê sau khi kết thúc**: Khi trận đấu kết thúc, bot sẽ gửi:
+  - Kết quả trận đấu (Thắng/Thua, tỷ số)
+  - K/D/A, điểm số, sát thương
+  - Agent sử dụng, headshot %
+  - **Nhận xét AI tự động** bằng tiếng Việt dựa trên thống kê
+
+### Lưu ý:
+- Bot sẽ tự động kiểm tra mỗi 30 giây để phát hiện trận đấu mới
+- Cần có Riot Games API key hợp lệ trong file `.env`
+- **Quan trọng**: Riot Games API cho Valorant yêu cầu Production API key. Development key (personal key) có thể không có quyền truy cập vào Valorant API endpoints. Bạn cần:
+  1. Đăng ký tại [Riot Developer Portal](https://developer.riotgames.com/)
+  2. Nộp đơn xin Production API key với mô tả dự án của bạn
+  3. Chờ Riot Games phê duyệt
+- API key có giới hạn rate limit (100 requests/2 phút cho development key, cao hơn cho production key)
+- Bot sẽ gửi thông báo khi phát hiện người chơi bắt đầu trận đấu mới
+- Region mặc định là `ap` (Asia Pacific). Có thể thay đổi trong `.env` với `RIOT_REGION`
 
 ## Cấu hình AI
 
