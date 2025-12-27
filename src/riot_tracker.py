@@ -238,37 +238,37 @@ class RiotTracker:
                                 })
                                 logger.info(f"Match ended for {riot_name}#{riot_tag}: {ended_match_id}")
                         player_info["current_match_id"] = None
-                else:
-                    # If no active match, check recent match history for new matches
-                    recent_matches = await self.get_recent_matches(puuid, count=1)
-                    
-                    if recent_matches and len(recent_matches) > 0:
-                        latest_match = recent_matches[0]
-                        match_id = latest_match.get("matchId")
-                        last_match_id = player_info.get("last_match_id")
+                    else:
+                        # If no active match and wasn't in match, check recent match history for new matches
+                        recent_matches = await self.get_recent_matches(puuid, count=1)
                         
-                        # Check if this is a new match (not the same as last known)
-                        if match_id and match_id != last_match_id:
-                            # Only notify if the match is very recent (within last 5 minutes)
-                            # This helps avoid notifying about old matches
-                            match_time = latest_match.get("gameStartTimeMillis", 0)
-                            if match_time:
-                                from datetime import datetime
-                                match_datetime = datetime.fromtimestamp(match_time / 1000)
-                                time_diff = (datetime.now() - match_datetime).total_seconds()
-                                
-                                # Only notify if match started within last 5 minutes
-                                if time_diff < 300:  # 5 minutes
-                                    player_info["last_match_id"] = match_id
-                                    new_matches.append({
-                                        "discord_user_id": discord_user_id,
-                                        "riot_name": riot_name,
-                                        "riot_tag": riot_tag,
-                                        "match_id": match_id,
-                                        "match_data": latest_match,
-                                        "is_active": False
-                                    })
-                                    logger.info(f"New match detected for {riot_name}#{riot_tag}: {match_id}")
+                        if recent_matches and len(recent_matches) > 0:
+                            latest_match = recent_matches[0]
+                            match_id = latest_match.get("matchId")
+                            last_match_id = player_info.get("last_match_id")
+                            
+                            # Check if this is a new match (not the same as last known)
+                            if match_id and match_id != last_match_id:
+                                # Only notify if the match is very recent (within last 5 minutes)
+                                # This helps avoid notifying about old matches
+                                match_time = latest_match.get("gameStartTimeMillis", 0)
+                                if match_time:
+                                    from datetime import datetime
+                                    match_datetime = datetime.fromtimestamp(match_time / 1000)
+                                    time_diff = (datetime.now() - match_datetime).total_seconds()
+                                    
+                                    # Only notify if match started within last 5 minutes
+                                    if time_diff < 300:  # 5 minutes
+                                        player_info["last_match_id"] = match_id
+                                        new_matches.append({
+                                            "discord_user_id": discord_user_id,
+                                            "riot_name": riot_name,
+                                            "riot_tag": riot_tag,
+                                            "match_id": match_id,
+                                            "match_data": latest_match,
+                                            "is_active": False
+                                        })
+                                        logger.info(f"New match detected for {riot_name}#{riot_tag}: {match_id}")
                 
             except Exception as e:
                 logger.error(f"Error checking matches for player {discord_user_id}: {str(e)}")
