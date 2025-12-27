@@ -2,7 +2,7 @@ import logging
 import asyncio
 from src.config import get_bot_config, TOKEN
 from src.message_handler import process_message
-from src.riot_tracker import riot_tracker
+from src.lol_tracker import lol_tracker
 import discord
 
 # Set up logging
@@ -19,22 +19,21 @@ bot = get_bot_config()
 async def on_ready():
     logger.info(f'{bot.user} đã sẵn sàng phục vụ!')
     
-    # Start Valorant match monitoring
-    if not riot_tracker.is_running:
+    # Start League of Legends match monitoring
+    if not lol_tracker.is_running:
         # Set notification channel to the first available text channel
-        # You can customize this or set it via command
         for guild in bot.guilds:
             for channel in guild.text_channels:
                 if channel.permissions_for(guild.me).send_messages:
-                    riot_tracker.set_notification_channel(channel.id)
+                    lol_tracker.set_notification_channel(channel.id)
                     logger.info(f"Set notification channel to: {channel.name} ({channel.id})")
                     break
-            if riot_tracker.notification_channel_id:
+            if lol_tracker.notification_channel_id:
                 break
         
         # Start monitoring in background
-        asyncio.create_task(riot_tracker.start_monitoring(bot, check_interval=30))
-        logger.info("Valorant match monitoring started")
+        asyncio.create_task(lol_tracker.start_monitoring(bot, check_interval=30))
+        logger.info("League of Legends match monitoring started")
 
 @bot.event
 async def on_message(message):
@@ -46,39 +45,64 @@ async def on_message(message):
     if not message.content or message.content.strip() == "":
         return
     
-    # Handle Valorant tracking commands
+    # Handle League of Legends tracking commands
     content = message.content.strip()
     
-    # Command: !track valorant <riot_name> <riot_tag>
-    if content.startswith("!track valorant"):
+    # Command: !link <riot_name> <riot_tag>
+    if content.startswith("!link"):
         try:
             parts = content.split()
-            if len(parts) >= 4:
-                riot_name = parts[2]
-                riot_tag = parts[3]
+            if len(parts) >= 3:
+                riot_name = parts[1]
+                riot_tag = parts[2]
                 discord_user_id = str(message.author.id)
                 
-                riot_tracker.add_tracked_player(discord_user_id, riot_name, riot_tag)
+                lol_tracker.link_discord_to_riot(discord_user_id, riot_name, riot_tag)
+                lol_tracker.add_tracked_player(discord_user_id, riot_name, riot_tag)
                 await message.channel.send(
-                    f"✅ Đã thêm {riot_name}#{riot_tag} vào danh sách theo dõi Valorant!"
+                    f"✅ Đã liên kết tài khoản Discord với {riot_name}#{riot_tag}!\n"
+                    f"Bot sẽ tự động theo dõi khi bạn chơi League of Legends."
                 )
             else:
                 await message.channel.send(
-                    "❌ Cú pháp: `!track valorant <tên_riot> <tag_riot>`\n"
-                    "Ví dụ: `!track valorant PlayerName 1234`"
+                    "❌ Cú pháp: `!link <tên_riot> <tag_riot>`\n"
+                    "Ví dụ: `!link PlayerName 1234`"
+                )
+        except Exception as e:
+            logger.error(f"Error linking account: {str(e)}")
+            await message.channel.send(f"❌ Lỗi: {str(e)}")
+        return
+    
+    # Command: !track <riot_name> <riot_tag>
+    if content.startswith("!track"):
+        try:
+            parts = content.split()
+            if len(parts) >= 3:
+                riot_name = parts[1]
+                riot_tag = parts[2]
+                discord_user_id = str(message.author.id)
+                
+                lol_tracker.add_tracked_player(discord_user_id, riot_name, riot_tag)
+                await message.channel.send(
+                    f"✅ Đã thêm {riot_name}#{riot_tag} vào danh sách theo dõi!"
+                )
+            else:
+                await message.channel.send(
+                    "❌ Cú pháp: `!track <tên_riot> <tag_riot>`\n"
+                    "Ví dụ: `!track PlayerName 1234`"
                 )
         except Exception as e:
             logger.error(f"Error adding tracked player: {str(e)}")
             await message.channel.send(f"❌ Lỗi: {str(e)}")
         return
     
-    # Command: !untrack valorant
-    if content.startswith("!untrack valorant"):
+    # Command: !untrack
+    if content.startswith("!untrack"):
         try:
             discord_user_id = str(message.author.id)
-            if discord_user_id in riot_tracker.tracked_players:
-                player_info = riot_tracker.tracked_players[discord_user_id]
-                riot_tracker.remove_tracked_player(discord_user_id)
+            if discord_user_id in lol_tracker.tracked_players:
+                player_info = lol_tracker.tracked_players[discord_user_id]
+                lol_tracker.remove_tracked_player(discord_user_id)
                 await message.channel.send(
                     f"✅ Đã xóa {player_info['riot_name']}#{player_info['riot_tag']} khỏi danh sách theo dõi!"
                 )
@@ -89,13 +113,13 @@ async def on_message(message):
             await message.channel.send(f"❌ Lỗi: {str(e)}")
         return
     
-    # Command: !set valorant channel
-    if content.startswith("!set valorant channel"):
+    # Command: !set channel
+    if content.startswith("!set channel"):
         try:
             if message.author.guild_permissions.administrator:
-                riot_tracker.set_notification_channel(message.channel.id)
+                lol_tracker.set_notification_channel(message.channel.id)
                 await message.channel.send(
-                    f"✅ Đã đặt kênh này ({message.channel.name}) làm kênh thông báo Valorant!"
+                    f"✅ Đã đặt kênh này ({message.channel.name}) làm kênh thông báo!"
                 )
             else:
                 await message.channel.send("❌ Bạn cần quyền Administrator để sử dụng lệnh này.")
@@ -104,44 +128,16 @@ async def on_message(message):
             await message.channel.send(f"❌ Lỗi: {str(e)}")
         return
     
-    # Command: !link riot <riot_name> <riot_tag>
-    if content.startswith("!link riot"):
+    # Command: !list
+    if content.startswith("!list"):
         try:
-            parts = content.split()
-            if len(parts) >= 4:
-                riot_name = parts[2]
-                riot_tag = parts[3]
-                discord_user_id = str(message.author.id)
-                
-                # Link Discord to Riot account
-                riot_tracker.link_discord_to_riot(discord_user_id, riot_name, riot_tag)
-                # Also add to tracking
-                riot_tracker.add_tracked_player(discord_user_id, riot_name, riot_tag)
-                await message.channel.send(
-                    f"✅ Đã liên kết tài khoản Discord của bạn với {riot_name}#{riot_tag}!\n"
-                    f"Bot sẽ tự động theo dõi khi bạn chơi Valorant."
-                )
-            else:
-                await message.channel.send(
-                    "❌ Cú pháp: `!link riot <tên_riot> <tag_riot>`\n"
-                    "Ví dụ: `!link riot PlayerName 1234`"
-                )
-        except Exception as e:
-            logger.error(f"Error linking account: {str(e)}")
-            await message.channel.send(f"❌ Lỗi: {str(e)}")
-        return
-    
-    # Command: !list tracked
-    if content.startswith("!list tracked"):
-        try:
-            if len(riot_tracker.tracked_players) == 0:
+            if len(lol_tracker.tracked_players) == 0:
                 await message.channel.send("📋 Chưa có người chơi nào được theo dõi.")
             else:
-                players_list = []
-                for discord_id, player_info in riot_tracker.tracked_players.items():
-                    players_list.append(
-                        f"• {player_info['riot_name']}#{player_info['riot_tag']}"
-                    )
+                players_list = [
+                    f"• {player_info['riot_name']}#{player_info['riot_tag']}"
+                    for player_info in lol_tracker.tracked_players.values()
+                ]
                 await message.channel.send(
                     f"📋 **Danh sách người chơi được theo dõi:**\n" + "\n".join(players_list)
                 )
@@ -171,31 +167,26 @@ async def on_error(event, *args, **kwargs):
 
 @bot.event
 async def on_presence_update(before, after):
-    """Detect when a user starts playing Valorant and auto-track them."""
+    """Detect when a user starts playing League of Legends and auto-track them."""
     try:
-        # Check if user started playing Valorant
         if not after.activity or not after.activity.name:
             return
         
-        # Check if playing Valorant
         game_name = after.activity.name.lower()
-        if "valorant" in game_name:
-            discord_user_id = str(after.id)
-            
-            # Check if user has linked their Riot account
-            if discord_user_id in riot_tracker.discord_to_riot:
-                riot_info = riot_tracker.discord_to_riot[discord_user_id]
+        discord_user_id = str(after.id)
+        
+        # Check if playing League of Legends
+        if "league of legends" in game_name or "league" in game_name or "lol" in game_name:
+            if discord_user_id in lol_tracker.discord_to_riot:
+                riot_info = lol_tracker.discord_to_riot[discord_user_id]
                 riot_name = riot_info["riot_name"]
                 riot_tag = riot_info["riot_tag"]
                 
-                # Auto-add to tracking if not already tracked
-                if discord_user_id not in riot_tracker.tracked_players:
-                    riot_tracker.add_tracked_player(discord_user_id, riot_name, riot_tag)
-                    logger.info(f"Auto-tracked {after.display_name} ({riot_name}#{riot_tag}) - started playing Valorant")
+                if discord_user_id not in lol_tracker.tracked_players:
+                    lol_tracker.add_tracked_player(discord_user_id, riot_name, riot_tag)
+                    logger.info(f"Auto-tracked {after.display_name} ({riot_name}#{riot_tag}) - started playing League of Legends")
             else:
-                # User is playing Valorant but hasn't linked account
-                # We could send a DM or message, but for now just log
-                logger.info(f"User {after.display_name} is playing Valorant but hasn't linked Riot account")
+                logger.info(f"User {after.display_name} is playing League of Legends but hasn't linked Riot account")
                 
     except Exception as e:
         logger.error(f"Error in presence update: {str(e)}")
