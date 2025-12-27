@@ -33,11 +33,13 @@ SPECIAL_USERS = {
     "Kaisen#exson": "Thằng này giả mạo tôi! ",
     "Skye._": "Địt mẹ mày Minh! ",
     "DeadBush": "Vâng đại ca! ",
-    "To Man": "Em chào anh! "
+    "To Man": "Em chào anh! ",
+    "Miin": "Địt mẹ mày Minh Tùng",
 } 
 
 # Special responses
 SPECIAL_RESPONSES = {
-    "Minh" : "Đó là bạn thân của tôi ",
-    "Mẫn" : "Đó là bố của tôi ",
+    "Minh" : "Đó là bạn thân nhất của tôi ",
+    "Mẫn" : "Đó là bạn thân thứ 3 của tôi ",
+    "Minh Tùng" : "Đó là bạn thân thứ 2 của tôi "
 }

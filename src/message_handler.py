@@ -1,24 +1,27 @@
 import random
+import asyncio
 from src.constants import PERSONAL_INFO, FUNNY_RESPONSES, SPECIAL_RESPONSES, SPECIAL_USERS
 from src.utils import is_user_DeadBush, is_user_ToMan, is_user_Skye, is_user_Kaisen
+from src.ai_handler import get_ai_response
 
-def process_message(message, user_name):
-    """Process incoming messages and return appropriate response."""
+async def process_message(message, user_name):
+    """Process incoming messages and return appropriate response using AI model."""
     # Convert message to lowercase for easier processing
     lower_message = message.lower()
-
 
     # Author string
     author_str = str(user_name)
     print(f"Author string: {author_str}")
 
+    # Check for special users and add prefix if needed
+    prefix = ""
+    if author_str in SPECIAL_USERS:
+        prefix = SPECIAL_USERS[author_str]
 
     # Check if user is DeadBush
     if is_user_DeadBush(author_str):
-    # Check if message is not in Vietnamese
         if author_str in SPECIAL_USERS:
-            # Process personal info first
-
+            # Try personal info first (fast response)
             personal_response = process_personal_info(lower_message)
             special_response = process_special_responses(lower_message)
 
@@ -27,17 +30,14 @@ def process_message(message, user_name):
             
             if special_response:
                 return SPECIAL_USERS[author_str] + special_response
-            # If no personal info response, return random or default
-            return SPECIAL_USERS[author_str] + (random.choice(FUNNY_RESPONSES) if random.random() > 0.5 else "Tôi bị ngu")
-    
+            
+            # Use AI for other responses
+            ai_response = await get_ai_response(message, user_name)
+            return SPECIAL_USERS[author_str] + ai_response
 
-
-    #Check if user is Skye._
+    # Check if user is Skye._
     if is_user_Skye(user_name):
-    # Check if message is not in Vietnamese   
         if author_str in SPECIAL_USERS:
-            # Process personal info first
-
             personal_response = process_personal_info(lower_message)
             special_response = process_special_responses(lower_message)
 
@@ -46,15 +46,13 @@ def process_message(message, user_name):
             
             if special_response:
                 return SPECIAL_USERS[author_str] + special_response
-            # If no personal info response, return random or default
-            return SPECIAL_USERS[author_str] + (random.choice(FUNNY_RESPONSES) if random.random() > 0.5 else "Tôi bị ngu")
+            
+            ai_response = await get_ai_response(message, user_name)
+            return SPECIAL_USERS[author_str] + ai_response
         
-    #Check if user is Kaisen#exson
+    # Check if user is Kaisen#exson
     if is_user_Kaisen(user_name):
-    # Check if message is not in Vietnamese    
         if author_str in SPECIAL_USERS:
-            # Process personal info first
-
             personal_response = process_personal_info(lower_message)
             special_response = process_special_responses(lower_message)
 
@@ -64,18 +62,12 @@ def process_message(message, user_name):
             if special_response:
                 return SPECIAL_USERS[author_str] + special_response
             
-            # If no personal info response, return random or default
-            return SPECIAL_USERS[author_str] + (random.choice(FUNNY_RESPONSES) if random.random() > 0.5 else "Tôi bị ngu")
+            ai_response = await get_ai_response(message, user_name)
+            return SPECIAL_USERS[author_str] + ai_response
     
-
-    
-    #Check if user is To Man
+    # Check if user is To Man
     if is_user_ToMan(user_name):
-    # Check if message is not in Vietnamese     
-        # Check for special users
         if author_str in SPECIAL_USERS:
-            # Process personal info first
-
             personal_response = process_personal_info(lower_message)
             special_response = process_special_responses(lower_message)
 
@@ -85,19 +77,22 @@ def process_message(message, user_name):
             if special_response:
                 return SPECIAL_USERS[author_str] + special_response
             
-            # If no personal info response, return random or default
-            return SPECIAL_USERS[author_str] + (random.choice(FUNNY_RESPONSES) if random.random() > 0.5 else "Tôi bị ngu")
-        
+            ai_response = await get_ai_response(message, user_name)
+            return SPECIAL_USERS[author_str] + ai_response
 
-
-
-    # Process personal information questions
-    response = process_personal_info(lower_message) or process_special_responses(lower_message)
-    if response:
-        return response
-        
-    # Return random response or default
-    return random.choice(FUNNY_RESPONSES) if random.random() > 0.5 else "Tôi bị ngu"
+    # For regular users, try personal info first, then use AI
+    personal_response = process_personal_info(lower_message)
+    special_response = process_special_responses(lower_message)
+    
+    if personal_response:
+        return personal_response
+    
+    if special_response:
+        return special_response
+    
+    # Use AI model for all other messages
+    ai_response = await get_ai_response(message, user_name)
+    return ai_response
 
 def process_personal_info(message):
     """Process questions about personal information."""
