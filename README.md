@@ -46,13 +46,15 @@ python bot.py
 ## Cách sử dụng
 
 1. Thêm bot vào server Discord của bạn
-2. Gửi tin nhắn bắt đầu bằng `!thong` để bot phản hồi
+2. Bot sẽ tự động phản hồi **tất cả tin nhắn** trong các kênh mà nó có quyền truy cập
 3. Bot sẽ:
    - Sử dụng AI để trả lời các câu hỏi một cách thông minh
    - Trả lời các câu hỏi về thông tin cá nhân từ `prompts.txt`
    - Phản hồi với phong cách trẻ trung, hài hước, châm biếm
    - Trả lời "Tôi bị ngu" cho tin nhắn không phải tiếng Việt hoặc không hiểu
    - Tự động tùy chỉnh phong cách dựa trên nội dung trong `prompts.txt`
+
+**Lưu ý:** Bot sẽ phản hồi mọi tin nhắn (trừ tin nhắn từ chính bot). Đảm bảo bot chỉ có quyền truy cập vào các kênh bạn muốn bot hoạt động.
 
 ## Cấu hình AI
 
