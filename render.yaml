@@ -1,5 +1,8 @@
 services:
-  - type: worker
+  # NOTE: Render free tier no longer supports Background Workers
+  # This config uses Web Service (may have limitations)
+  # Consider using Fly.io, Replit, or Railway.app instead for free Discord bot hosting
+  - type: web
     name: discord-bot
     env: python
     buildCommand: pip install -r requirements.txt
@@ -13,7 +16,4 @@ services:
         sync: false
       - key: HUGGINGFACE_API_KEY
         sync: false
-    scaling:
-      minInstances: 1
-      maxInstances: 1
     plan: free

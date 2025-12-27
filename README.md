@@ -102,45 +102,16 @@ docker build -t discord-bot .
 
 > 📖 **Xem hướng dẫn chi tiết:** [DEPLOYMENT.md](DEPLOYMENT.md) - Hướng dẫn đầy đủ về cách deploy bot lên các nền tảng miễn phí
 
-### 1. Deploy lên Render.com (Khuyến nghị - Hoàn toàn miễn phí)
+### ⚠️ Render.com (Không khuyến nghị)
 
-**Render.com** là lựa chọn tốt nhất cho bot Discord vì:
-- ✅ 750 giờ miễn phí mỗi tháng (đủ cho 24/7)
-- ✅ Không yêu cầu thẻ tín dụng
-- ✅ Uptime ổn định
-- ✅ Tự động deploy từ GitHub
+**Vấn đề:**
+- ❌ Render **KHÔNG còn hỗ trợ Background Workers miễn phí**
+- ❌ Background Workers yêu cầu paid plan ($7/tháng)
+- ❌ Chỉ có Web Services miễn phí (không phù hợp cho Discord bots)
 
-**Cách deploy:**
+**Khuyến nghị:** Sử dụng **Fly.io** hoặc **Replit** thay vì Render cho Discord bots miễn phí.
 
-**Cách 1: Sử dụng render.yaml (Khuyến nghị)**
-1. Đảm bảo file `render.yaml` đã có trong repository
-2. Đăng ký tại [Render](https://render.com)
-3. Kết nối repository GitHub của bạn
-4. Chọn "New" → "Blueprint"
-5. Render sẽ tự động detect `render.yaml` và cấu hình
-6. Thêm các environment variables:
-   - `DISCORD_TOKEN`: Token của bot Discord
-   - `GROQ_API_KEY`: API key từ Groq (miễn phí)
-   - `HUGGINGFACE_API_KEY`: (Tùy chọn) API key từ Hugging Face
-7. Click "Apply" để deploy
-
-**Cách 2: Deploy thủ công**
-1. Đăng ký tại [Render](https://render.com)
-2. Kết nối repository GitHub
-3. Chọn "New" → "Background Worker"
-4. Cấu hình:
-   - **Name**: discord-bot
-   - **Environment**: Python 3
-   - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: `python bot.py`
-5. Thêm environment variables:
-   - `DISCORD_TOKEN`: Token của bot Discord
-   - `GROQ_API_KEY`: API key từ Groq
-   - `HUGGINGFACE_API_KEY`: (Tùy chọn) API key từ Hugging Face
-6. Chọn "Free" plan
-7. Click "Create Background Worker"
-
-### 2. Deploy lên Fly.io (Miễn phí - Khuyến nghị thứ 2)
+### 1. Deploy lên Fly.io (Khuyến nghị nhất - Hoàn toàn miễn phí)
 
 **Fly.io** cung cấp:
 - ✅ 3 VMs miễn phí (shared-cpu-1x, 256MB RAM)
@@ -160,7 +131,7 @@ docker build -t discord-bot .
    ```
 6. Deploy: `fly deploy`
 
-### 3. Deploy lên Replit (Lựa chọn thay thế)
+### 2. Deploy lên Replit (Khuyến nghị thứ 2 - Hoàn toàn miễn phí)
 
 1. Đăng ký tài khoản tại [Replit](https://replit.com)
 2. Tạo một Repl mới với template Python
@@ -175,7 +146,7 @@ docker build -t discord-bot .
    - Sử dụng [UptimeRobot](https://uptimerobot.com) để ping Repl URL mỗi 5 phút
    - Hoặc nâng cấp lên Replit Hacker Plan để có uptime tốt hơn
 
-### 4. Deploy lên Railway.app (Có giới hạn)
+### 3. Deploy lên Railway.app (Có giới hạn)
 
 1. Đăng ký tài khoản tại [Railway](https://railway.app)
 2. Kết nối với GitHub repository
@@ -192,42 +163,41 @@ docker build -t discord-bot .
 
 | Platform | Free Tier | Uptime | Setup | Best For |
 |----------|-----------|--------|-------|----------|
-| **Render.com** | 750 giờ/tháng | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | **Khuyến nghị nhất** |
-| **Fly.io** | 3 VMs miễn phí | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | Production apps |
-| **Replit** | Unlimited | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | Development/Testing |
+| **Fly.io** | 3 VMs miễn phí | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | **Production - Khuyến nghị nhất** |
+| **Replit** | Unlimited | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | **Development/Testing - Khuyến nghị** |
 | **Railway.app** | $5 credit/tháng | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | Quick deploy |
+| **Render.com** | Web Service only | ⭐⭐ | ⭐⭐⭐⭐⭐ | ❌ Không khuyến nghị cho bots |
 
 ### Chi tiết:
 
-1. **Render.com** ⭐ **Khuyến nghị nhất**
-   - ✅ 750 giờ miễn phí mỗi tháng (đủ cho 24/7)
-   - ✅ Không yêu cầu thẻ tín dụng
-   - ✅ Setup đơn giản với render.yaml
-   - ✅ Uptime ổn định
-   - ✅ Auto-deploy từ GitHub
-
-2. **Fly.io**
+1. **Fly.io** 🏆 **Khuyến nghị nhất cho Production**
    - ✅ 3 VMs miễn phí (shared-cpu-1x, 256MB RAM)
    - ✅ Không yêu cầu thẻ tín dụng
    - ✅ Uptime rất ổn định
    - ✅ Global edge network
+   - ✅ Không bị sleep
    - ⚠️ Cần CLI để setup
 
-3. **Replit**
+2. **Replit** 🥈 **Khuyến nghị cho Development**
    - ✅ Hoàn toàn miễn phí
    - ✅ Có IDE trực tuyến
    - ✅ Setup cực kỳ dễ
    - ❌ Cần trick để duy trì uptime (UptimeRobot)
    - ❌ Có thể bị lag
-   - ⚠️ Tốt cho testing, không khuyến nghị cho production
+   - ⚠️ Tốt cho testing, có thể dùng cho production với UptimeRobot
 
-4. **Railway.app**
+3. **Railway.app**
    - ✅ $5 credit miễn phí mỗi tháng
    - ✅ Setup dễ dàng
    - ✅ Auto-deploy từ GitHub
    - ❌ Yêu cầu GitHub account
    - ❌ Giới hạn sau khi hết credit
    - ⚠️ Có thể cần thanh toán sau khi hết credit
+
+4. **Render.com** ⚠️ **Không khuyến nghị**
+   - ❌ Không còn hỗ trợ Background Workers miễn phí
+   - ❌ Chỉ có Web Services (không phù hợp cho Discord bots)
+   - ❌ Background Workers yêu cầu paid plan ($7/tháng)
 
 ## Lưu ý quan trọng khi deploy
 

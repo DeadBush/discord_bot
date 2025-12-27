@@ -21,46 +21,23 @@ Bot Discord này có thể được host hoàn toàn miễn phí trên nhiều n
 
 ## Các nền tảng hosting miễn phí
 
-### 🏆 Render.com (Khuyến nghị nhất)
+### ⚠️ Render.com (Không khuyến nghị cho Discord bots)
 
-**Ưu điểm:**
-- ✅ 750 giờ miễn phí/tháng (đủ cho 24/7)
-- ✅ Không cần thẻ tín dụng
-- ✅ Setup cực kỳ đơn giản
-- ✅ Uptime ổn định
-- ✅ Auto-deploy từ GitHub
+**Vấn đề:**
+- ❌ Render **KHÔNG còn hỗ trợ Background Workers miễn phí**
+- ❌ Chỉ có Web Services miễn phí (không phù hợp cho Discord bots)
+- ❌ Background Workers yêu cầu paid plan ($7/tháng)
 
-**Cách deploy:**
+**Nếu vẫn muốn thử Render (Web Service):**
+1. Deploy như Web Service (không phải Background Worker)
+2. Bot có thể bị sleep sau 15 phút không hoạt động
+3. Có thể gặp rate limiting issues
 
-1. **Chuẩn bị:**
-   - Đảm bảo file `render.yaml` có trong repository
-   - Push code lên GitHub
-
-2. **Tạo service trên Render:**
-   - Đăng ký/đăng nhập tại [Render](https://render.com)
-   - Click "New" → "Blueprint"
-   - Kết nối GitHub repository
-   - Render sẽ tự động detect `render.yaml`
-
-3. **Cấu hình Environment Variables:**
-   - Vào Settings → Environment
-   - Thêm các biến sau:
-     ```
-     DISCORD_TOKEN=your_discord_bot_token
-     GROQ_API_KEY=your_groq_api_key
-     HUGGINGFACE_API_KEY=your_hf_key (tùy chọn)
-     ```
-
-4. **Deploy:**
-   - Click "Apply" hoặc "Save Changes"
-   - Render sẽ tự động build và deploy
-   - Kiểm tra logs để đảm bảo bot chạy thành công
-
-**Lưu ý:** Render có thể sleep sau 15 phút không hoạt động (free tier). Bot Discord sẽ tự động reconnect khi có tin nhắn.
+**Khuyến nghị:** Sử dụng **Fly.io** hoặc **Replit** thay vì Render cho Discord bots miễn phí.
 
 ---
 
-### 🚀 Fly.io (Khuyến nghị thứ 2)
+### 🏆 Fly.io (Khuyến nghị nhất - Hoàn toàn miễn phí)
 
 **Ưu điểm:**
 - ✅ 3 VMs miễn phí
@@ -109,7 +86,7 @@ Bot Discord này có thể được host hoàn toàn miễn phí trên nhiều n
 
 ---
 
-### 💻 Replit (Dễ nhất nhưng cần trick)
+### 🥈 Replit (Dễ nhất - Hoàn toàn miễn phí)
 
 **Ưu điểm:**
 - ✅ Hoàn toàn miễn phí
@@ -167,10 +144,10 @@ Bot Discord này có thể được host hoàn toàn miễn phí trên nhiều n
 
 | Platform | Free Tier | Uptime | Setup | Tốt cho |
 |----------|-----------|--------|-------|---------|
-| **Render** | 750h/tháng | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | **Production** |
-| **Fly.io** | 3 VMs | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | Production |
-| **Replit** | Unlimited | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | Testing |
+| **Fly.io** | 3 VMs | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | **Production - Khuyến nghị** |
+| **Replit** | Unlimited | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | **Testing/Development - Khuyến nghị** |
 | **Railway** | $5/tháng | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | Quick deploy |
+| **Render** | Web Service only | ⭐⭐ | ⭐⭐⭐⭐⭐ | ❌ Không khuyến nghị cho bots |
 
 ## Troubleshooting
 
